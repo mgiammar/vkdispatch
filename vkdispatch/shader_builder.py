@@ -174,7 +174,9 @@ class ShaderBuilder:
         return new_var
 
     def make_var(self, var_type: vd.dtype, var_name: str = None):
-        return vd.ShaderVariable(self.append_contents, self.get_name, var_type, var_name)
+        return vd.ShaderVariable(
+            self.append_contents, self.get_name, var_type, var_name
+        )
 
     def push_constant(self, var_type: vd.dtype, var_name: str):
         new_var = self.make_var(var_type, f"PC.{var_name}")
@@ -232,6 +234,9 @@ class ShaderBuilder:
     def ceil(self, arg: vd.ShaderVariable):
         return self.make_var(arg.var_type, f"ceil({arg})")
 
+    def floor(self, arg: vd.ShaderVariable):
+        return self.make_var(arg.var_type, f"floor({arg})")
+
     def exp(self, arg: vd.ShaderVariable):
         return self.make_var(arg.var_type, f"exp({arg})")
 
@@ -243,6 +248,9 @@ class ShaderBuilder:
 
     def sqrt(self, arg: vd.ShaderVariable):
         return self.make_var(arg.var_type, f"sqrt({arg})")
+
+    def max(self, arg1: vd.ShaderVariable, arg2: vd.ShaderVariable):
+        return self.make_var(arg1.var_type, f"max({arg1}, {arg2})")
 
     def atomic_add(self, arg1: vd.ShaderVariable, arg2: vd.ShaderVariable):
         new_var = self.new(arg1.var_type)
@@ -294,7 +302,9 @@ class ShaderBuilder:
 
             header += f"\nlayout(push_constant) uniform PushConstant {{\n { push_constant_contents } \n}} PC;\n"
 
-        layout_str = f"layout(local_size_x = {x}, local_size_y = {y}, local_size_z = {z}) in;"
+        layout_str = (
+            f"layout(local_size_x = {x}, local_size_y = {y}, local_size_z = {z}) in;"
+        )
 
         return f"{header}\n{layout_str}\nvoid main() {{\n{self.contents}\n}}\n"
 
